@@ -2,7 +2,7 @@
 
 [![npm (scoped)](https://img.shields.io/npm/v/@davidahouse/git-lost.svg)](https://www.npmjs.com/package/davidahouse/git-lost)
 
-This command line tool will find any repositories that have a dirty working folder.
+This command line tool will find any local git repositories that have a dirty working folder.
 
 Installation:
 
