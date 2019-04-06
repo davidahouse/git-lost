@@ -1,5 +1,5 @@
 {
-  "name": "git-lost",
+  "name": "@davidahouse/git-lost",
   "main": "bin/git-lost.js",
   "version": "0.1.0",
   "description": "A command line tool for finding & managing dirty git repositories",
