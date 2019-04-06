@@ -7,7 +7,7 @@ This command line tool will find any local git repositories that have a dirty wo
 Installation:
 
 ```
-npm install -g git-lost
+npm install -g @davidahouse/git-lost
 ```
 
 Usage:
