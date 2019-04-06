@@ -1,0 +1,58 @@
+{
+  "name": "git-lost",
+  "main": "bin/git-lost.js",
+  "version": "0.1.0",
+  "description": "A command line tool for finding & managing dirty git repositories",
+  "license": "MIT",
+  "repository": "davidahouse/git-lost",
+  "preferGlobal": true,
+  "bin": {
+    "git-lost": "bin/git-lost.js"
+  },
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "clear": "^0.1.0",
+    "commander": "^2.19.0",
+    "figlet": "^1.2.1",
+    "rc": "^1.2.8",
+    "simple-git": "^1.110.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.9.0",
+    "eslint-config-google": "^0.11.0"
+  },
+  "scripts": {
+    "lint": "eslint $(find . -name \"*.js\" -not -path \"./node_modules/*\" -not -path \"./public/*\")",
+    "lint-fix": "eslint --fix $(find . -name \"*.js\" -not -path \"./node_modules/*\" -not -path \"./public/*\")"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "google"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 6,
+      "ecmaFeatures": {
+        "impliedStrict": true
+      },
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-console": 0,
+      "max-len": [
+        "error",
+        {
+          "code": 120
+        }
+      ],
+      "semi": [
+        "error",
+        "never"
+      ]
+    }
+  }
+}
