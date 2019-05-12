@@ -3,6 +3,7 @@ const fs = require('fs')
 const chalk = require('chalk')
 const clear = require('clear')
 const figlet = require('figlet')
+var pkginfo = require('pkginfo')(module)
 const conf = require('rc')('git-lost', {
   // defaults
   workingFolder: '.',
@@ -16,7 +17,7 @@ const conf = require('rc')('git-lost', {
 
 clear()
 console.log(chalk.yellow(figlet.textSync('git-lost', {horizontalLayout: 'full'})))
-console.log(chalk.yellow('version 0.1.0'))
+console.log(chalk.yellow(module.exports.version))
 console.log(chalk.yellow('searching for repositories in ' + conf.workingFolder))
 
 findRepos(conf.workingFolder)

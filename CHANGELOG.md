@@ -1,5 +1,9 @@
 ## git-lost
 
+## 0.2.1
+
+- Fixed issue with version number printed to the console
+
 ## 0.2.0
 
 - Added action parameter to allow for different commands: dirty, branch and list
