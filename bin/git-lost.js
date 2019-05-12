@@ -6,8 +6,12 @@ const figlet = require('figlet')
 const conf = require('rc')('git-lost', {
   // defaults
   workingFolder: '.',
-  showDirty: true,
-  showClean: false,
+  // actions:
+  // dirty  (show repositories that have local changes or aren't in sync with remote)
+  // list   (list all the repositories)
+  // branch (show repositories that aren't on the default branch)
+  action: 'dirty',
+  defaultBranches: 'development, master, release',
 })
 
 clear()
@@ -27,12 +31,28 @@ function findRepos(folder) {
     simpleGit.status(function(err, result) {
       const basename = folder.replace(conf.workingFolder, '')
       if (result.files.length > 0) {
-        if (conf.showDirty) {
-          console.log(chalk.red(basename + '(' + result.current + ')'))
+        if (conf.action === 'dirty' || conf.action === 'list') {
+          console.log(chalk.red('🚧' + basename + '(' + result.current + ')'))
         }
       } else {
-        if (conf.showClean) {
-          console.log(chalk.green(basename + '(' + result.current + ')'))
+        if (result.ahead > 0) {
+          if (conf.action === 'dirty' || conf.action === 'list') {
+            console.log(chalk.yellow('🗒' + basename + '(' + result.current + ')'))
+          }
+        } else if (result.behind > 0) {
+          if (conf.action === 'dirty' || conf.action === 'list') {
+            console.log(chalk.yellow('🔁' + basename + '(' + result.current + ')'))
+          }
+        } else {
+          if (conf.defaultBranches.indexOf(result.current) >= 0) {
+            if (conf.action === 'list') {
+              console.log(chalk.green('✅' + basename + '(' + result.current + ')'))
+            }
+          } else {
+            if (conf.action === 'branch' || conf.action === 'list') {
+              console.log(chalk.red('🌳' + basename + '(' + result.current + ')'))
+            }
+          }
         }
       }
     })

@@ -21,3 +21,11 @@ You can also create a ~/.git-lostrc file and set a global working folder so you 
 ```
 workingFolder=/someFolder
 ```
+
+The default action is `dirty` which finds any repositories that have local changes or are ahead or behind the remote. The other commands are `branch` and `list`. `branch` shows any repositories that aren't on the default branch, and `list` shows all repositories found.
+
+You can specify the action on the command line:
+
+```
+git-lost --action branch
+```
