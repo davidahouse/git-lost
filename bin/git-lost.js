@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-const fs = require('fs')
-const chalk = require('chalk')
-const clear = require('clear')
-const figlet = require('figlet')
-var pkginfo = require('pkginfo')(module)
+const fs = require('fs');
+const chalk = require('chalk');
+const clear = require('clear');
+const figlet = require('figlet');
+var pkginfo = require('pkginfo')(module);
 const conf = require('rc')('git-lost', {
   // defaults
   workingFolder: '.',
@@ -12,15 +12,19 @@ const conf = require('rc')('git-lost', {
   // list   (list all the repositories)
   // branch (show repositories that aren't on the default branch)
   action: 'dirty',
-  defaultBranches: 'development, master, release',
-})
+  defaultBranches: 'development, master, release'
+});
 
-clear()
-console.log(chalk.yellow(figlet.textSync('git-lost', {horizontalLayout: 'full'})))
-console.log(chalk.yellow(module.exports.version))
-console.log(chalk.yellow('searching for repositories in ' + conf.workingFolder))
+clear();
+console.log(
+  chalk.yellow(figlet.textSync('git-lost', { horizontalLayout: 'full' }))
+);
+console.log(chalk.yellow(module.exports.version));
+console.log(
+  chalk.yellow('searching for repositories in ' + conf.workingFolder)
+);
 
-findRepos(conf.workingFolder)
+findRepos(conf.workingFolder);
 
 /**
  * findRepos
@@ -28,40 +32,59 @@ findRepos(conf.workingFolder)
  */
 function findRepos(folder) {
   if (fs.existsSync(folder + '/.git')) {
-    const simpleGit = require('simple-git')(folder)
-    simpleGit.status(function(err, result) {
-      const basename = folder.replace(conf.workingFolder, '')
-      if (result.files.length > 0) {
-        if (conf.action === 'dirty' || conf.action === 'list') {
-          console.log(chalk.red('🚧' + basename + '(' + result.current + ')'))
-        }
-      } else {
-        if (result.ahead > 0) {
-          if (conf.action === 'dirty' || conf.action === 'list') {
-            console.log(chalk.yellow('🗒' + basename + '(' + result.current + ')'))
-          }
-        } else if (result.behind > 0) {
-          if (conf.action === 'dirty' || conf.action === 'list') {
-            console.log(chalk.yellow('🔁' + basename + '(' + result.current + ')'))
-          }
-        } else {
-          if (conf.defaultBranches.indexOf(result.current) >= 0) {
-            if (conf.action === 'list') {
-              console.log(chalk.green('✅' + basename + '(' + result.current + ')'))
-            }
-          } else {
-            if (conf.action === 'branch' || conf.action === 'list') {
-              console.log(chalk.red('🌳' + basename + '(' + result.current + ')'))
-            }
-          }
-        }
-      }
-    })
+    const simpleGit = require('simple-git')(folder);
+    simpleGit.silent(true);
+    try {
+      simpleGit.fetch(function(err, result) {
+        checkStatus(simpleGit, folder);
+      });
+    } catch (e) {
+      checkStatus(simpleGit, folder);
+    }
   } else {
     fs.readdirSync(folder).filter(function(file) {
-      if (fs.statSync(folder+'/'+file).isDirectory()) {
-        findRepos(folder + '/' + file)
+      if (fs.statSync(folder + '/' + file).isDirectory()) {
+        findRepos(folder + '/' + file);
       }
-    })
+    });
   }
+}
+
+function checkStatus(simpleGit, folder) {
+  simpleGit.status(function(err, result) {
+    const basename = folder.replace(conf.workingFolder, '');
+    if (result.files.length > 0) {
+      if (conf.action === 'dirty' || conf.action === 'list') {
+        console.log(chalk.red('🚧' + basename + '(' + result.current + ')'));
+      }
+    } else {
+      if (result.ahead > 0) {
+        if (conf.action === 'dirty' || conf.action === 'list') {
+          console.log(
+            chalk.yellow('🗒' + basename + '(' + result.current + ')')
+          );
+        }
+      } else if (result.behind > 0) {
+        if (conf.action === 'dirty' || conf.action === 'list') {
+          console.log(
+            chalk.yellow('🔁' + basename + '(' + result.current + ')')
+          );
+        }
+      } else {
+        if (conf.defaultBranches.indexOf(result.current) >= 0) {
+          if (conf.action === 'list') {
+            console.log(
+              chalk.green('✅' + basename + '(' + result.current + ')')
+            );
+          }
+        } else {
+          if (conf.action === 'branch' || conf.action === 'list') {
+            console.log(
+              chalk.red('🌳' + basename + '(' + result.current + ')')
+            );
+          }
+        }
+      }
+    }
+  });
 }
