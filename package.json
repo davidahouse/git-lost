@@ -1,7 +1,7 @@
 {
   "name": "@davidahouse/git-lost",
   "main": "bin/git-lost.js",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A command line tool for finding & managing dirty git repositories",
   "license": "MIT",
   "repository": "davidahouse/git-lost",
