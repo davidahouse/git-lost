@@ -1,27 +1,32 @@
 #!/usr/bin/env node
-const fs = require('fs');
-const chalk = require('chalk');
-const clear = require('clear');
-const figlet = require('figlet');
-const Queue = require('better-queue');
-const EventEmitter = require('events');
+const fs = require("fs");
+const chalk = require("chalk");
+const clear = require("clear");
+const figlet = require("figlet");
+const Queue = require("better-queue");
+const EventEmitter = require("events");
+const path = require("path");
 
-var pkginfo = require('pkginfo')(module);
-const conf = require('rc')('git-lost', {
+var pkginfo = require("pkginfo")(module);
+const conf = require("rc")("git-lost", {
   // defaults
-  workingFolder: '.',
-  defaultBranches: 'development, master, release'
+  workingFolder: ".",
+  defaultBranches: "development,master,release",
+  ignoreFolders: ".git,DerivedData,build,node_modules"
 });
 
 const eventEmitter = new EventEmitter();
-const git = require('simple-git/promise');
+const git = require("simple-git/promise");
+const defaultBranches = conf.defaultBranches.split(",");
+const ignoreFolders = conf.ignoreFolders.split(",");
+console.log(ignoreFolders);
 
 clear();
 console.log(
-  chalk.green(figlet.textSync('git-lost', { horizontalLayout: 'full' }))
+  chalk.green(figlet.textSync("git-lost", { horizontalLayout: "full" }))
 );
 console.log(chalk.green(module.exports.version));
-console.log(chalk.green('searching for repositories in ' + conf.workingFolder));
+console.log(chalk.green("searching for repositories in " + conf.workingFolder));
 
 const q = new Queue(
   function(iteration, cb) {
@@ -30,14 +35,14 @@ const q = new Queue(
   { concurrent: 3 }
 );
 
-q.on('drain', function() {
-  eventEmitter.emit('finished');
+q.on("drain", function() {
+  eventEmitter.emit("finished");
 });
 
-eventEmitter.on('finished', function(result) {
+eventEmitter.on("finished", function(result) {
   var stats = q.getStats();
   console.log(
-    chalk.green('Finished checking ' + stats.total + ' repositories...')
+    chalk.green("Finished checking " + stats.total + " repositories...")
   );
 });
 
@@ -55,15 +60,15 @@ async function getStatus(folder, cb) {
       .fetch();
   } catch (e) {}
   const result = await git(folder).status();
-  const basename = folder.replace(conf.workingFolder, '');
+  const basename = folder.replace(conf.workingFolder, "");
   if (result.files.length > 0) {
-    console.log(chalk.red('🚧' + basename + '(' + result.current + ')'));
+    console.log(chalk.red("🚧" + basename + "(" + result.current + ")"));
   } else if (result.ahead > 0) {
-    console.log(chalk.yellow('🗒' + basename + '(' + result.current + ')'));
+    console.log(chalk.yellow("🗒" + basename + "(" + result.current + ")"));
   } else if (result.behind > 0) {
-    console.log(chalk.yellow('🔁' + basename + '(' + result.current + ')'));
-  } else if (conf.defaultBranches.indexOf(result.current) == -1) {
-    console.log(chalk.red('🌳' + basename + '(' + result.current + ')'));
+    console.log(chalk.yellow("🔁" + basename + "(" + result.current + ")"));
+  } else if (!defaultBranches.includes(result.current)) {
+    console.log(chalk.red("🌳" + basename + "(" + result.current + ")"));
   }
   cb();
 }
@@ -73,12 +78,15 @@ async function getStatus(folder, cb) {
  * @param {string} folder The folder to find repositories in
  */
 function findRepos(folder) {
-  if (fs.existsSync(folder + '/.git')) {
+  if (ignoreFolders.includes(path.basename(folder))) {
+    return;
+  }
+  if (fs.existsSync(folder + "/.git")) {
     q.push({ folder: folder });
   } else {
     fs.readdirSync(folder).filter(function(file) {
-      if (fs.statSync(folder + '/' + file).isDirectory()) {
-        findRepos(folder + '/' + file);
+      if (fs.statSync(folder + "/" + file).isDirectory()) {
+        findRepos(folder + "/" + file);
       }
     });
   }
