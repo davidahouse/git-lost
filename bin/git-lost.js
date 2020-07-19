@@ -11,7 +11,7 @@ var pkginfo = require("pkginfo")(module);
 const conf = require("rc")("git-lost", {
   // defaults
   workingFolder: ".",
-  defaultBranches: "development,master,release",
+  defaultBranches: "development,master,main,release",
   ignoreFolders: ".git,DerivedData,build,node_modules"
 });
 
