@@ -1,14 +1,16 @@
 #!/usr/bin/env node
-const fs = require("fs");
-const chalk = require("chalk");
-const clear = require("clear");
-const figlet = require("figlet");
-const Queue = require("better-queue");
-const EventEmitter = require("events");
-const path = require("path");
+import fs from 'fs'
+import chalk from 'chalk'
+import clear from 'clear'
+import figlet from 'figlet'
+import Queue from 'better-queue'
+import EventEmitter from 'events'
+import path from 'path'
+import rc from 'rc-house'
+import git from 'simple-git'
+import version from 'project-version'
 
-var pkginfo = require("pkginfo")(module);
-const conf = require("rc-house")("git-lost", {
+const conf = rc("git-lost", {
   // defaults
   workingFolder: ".",
   defaultBranches: "development,master,main,release",
@@ -16,7 +18,6 @@ const conf = require("rc-house")("git-lost", {
 });
 
 const eventEmitter = new EventEmitter();
-const git = require("simple-git");
 const defaultBranches = conf.defaultBranches.split(",");
 const ignoreFolders = conf.ignoreFolders.split(",");
 console.log(ignoreFolders);
@@ -25,7 +26,7 @@ clear();
 console.log(
   chalk.green(figlet.textSync("git-lost", { horizontalLayout: "full" }))
 );
-console.log(chalk.green(module.exports.version));
+console.log(chalk.green(version));
 console.log(chalk.green("searching for repositories in " + conf.workingFolder));
 
 const q = new Queue(
